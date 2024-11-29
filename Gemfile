@@ -58,3 +58,5 @@ gem 'sprockets', '< 4.0'
 gem 'ffi', '~> 1.15.5'
 gem 'mimemagic', '~> 0.3.6'
 gem 'marcel', '~> 0.3.3'
+
+gem 'core', path: 'core'
