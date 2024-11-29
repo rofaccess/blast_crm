@@ -5,10 +5,13 @@ FROM ruby:2.6.3
 WORKDIR /app
 
 # Copia el Gemfile al directorio de trabajo
-COPY Gemfile ./
+COPY Gemfile Gemfile.lock ./
 
 # Ejecuta el comando bundle para instalar las gemas
 RUN bundle check || bundle install
+
+# Copia el directorio actual del host dentro del directorio de trabajo del contenedor
+COPY . .
 
 # Se agrega y configura un usuario para evitar problemas de permisos en los archivos compartidos entre el host y el
 # contenedor. Dar permisos a /usr/local/bundle es para evitar errores al generar la aplicación Rails.
@@ -18,5 +21,5 @@ RUN groupadd --system --gid 1000 rails && \
 
 USER 1000:1000
 
-# Se ejecuta el siguiente comando para que el contenedor quede activo y no finalice inmediatamente
-CMD ["tail", "-f", "/dev/null"]
+# Ejecuta la aplicación al levantar el contendedor
+CMD ["rails", "s", "-b", "0.0.0.0"]

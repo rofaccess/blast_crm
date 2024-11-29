@@ -116,3 +116,57 @@ Salir del contendor y apagarlo
 exit
 docker compose down
 ```
+
+Ahora se deben hacer algunos cambios para poder ejecutar Rails.
+
+Actualizar el Dockerfile para copiar el proyecto dentro del contenedor.
+```Dockerfile
+# Imagen base
+FROM ruby:2.6.3
+
+# Establece el directorio de trabajo
+WORKDIR /app
+
+# Copia el Gemfile al directorio de trabajo
+COPY Gemfile Gemfile.lock ./
+
+# Ejecuta el comando bundle para instalar las gemas
+RUN bundle check || bundle install
+
+# Copia el directorio actual del host dentro del directorio de trabajo del contenedor
+COPY . .
+
+# Se agrega y configura un usuario para evitar problemas de permisos en los archivos compartidos entre el host y el
+# contenedor. Dar permisos a /usr/local/bundle es para evitar errores al generar la aplicación Rails.
+RUN groupadd --system --gid 1000 rails && \
+    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
+    chown -R rails:rails /usr/local/bundle
+
+USER 1000:1000
+
+# Ejecuta la aplicación al levantar el contendedor
+CMD ["rails", "s", "-b", "0.0.0.0"]
+```
+
+Configurar un volumen para las gemas en compose.yaml y mapear el puerto 3000 del contenedor al puerto 3000 del host
+```yaml
+services:
+  dev:
+    build: .
+    volumes:
+      - .:/app
+      - gems_data:/usr/local/bundle/gems
+    ports:
+      - "3000:3000"
+volumes:
+  gems_data:
+```
+
+Levantar el contenedor reconstruyendo la imagen
+```sh
+docker compose up --build -d
+```
+
+- `--build`: Reconstruye la imagen para que tome los cambios del Dockerfile
+
+Acceder a http://localhost:3000/
