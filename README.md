@@ -83,3 +83,36 @@ Ingresar al contenedor en ejecución
 ```sh
 docker compose exec -it dev /bin/bash
 ```
+
+Una vez dentro del contenedor, ejecutar los siguientes comandos
+```sh
+rails new blast_crm --skip-test # Crear el proyecto Rails
+# Si aparece un error relativo a ffi y/o spring, simplemente ignorarlo y seguir con los siguientes pasos
+mv blast_crm/* . # Mover el contenido del proyecto creado a la carpeta raiz
+mv blast_crm/.gitignore . # Mover archivos ocultos
+mv blast_crm/.ruby-version . # Mover archivos ocultos
+rm -rf blast_crm # Borrar la carpeta del proyecto
+```
+
+Actualizar el Gemfile para evitar algunos errores de incompatiblidad entre gemas
+```ruby
+# Actualizar la versión de sqlite 3
+gem 'sqlite3', '1.4'
+# Agregar y especificar las versiones de estas gemas
+gem 'sprockets', '< 4.0'
+gem 'ffi', '~> 1.15.5'
+gem 'mimemagic', '~> 0.3.6'
+gem 'marcel', '~> 0.3.3'
+```
+
+Actualizar las gemas dentro del contenedor y ejecutar la aplicación para comprobar su funcionamiento
+```sh
+bundle update
+rails s
+```
+
+Salir del contendor y apagarlo
+```sh
+exit
+docker compose down
+```
