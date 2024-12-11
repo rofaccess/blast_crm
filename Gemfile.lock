@@ -1,3 +1,9 @@
+PATH
+  remote: engines/core
+  specs:
+    blast_core (0.1.0)
+      rails (~> 5.2.4, >= 5.2.4.6)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -187,6 +193,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  blast_core!
   bootsnap (>= 1.1.0)
   byebug
   coffee-rails (~> 4.2)

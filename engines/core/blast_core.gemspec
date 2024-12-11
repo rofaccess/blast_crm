@@ -1,17 +1,17 @@
 $:.push File.expand_path("lib", __dir__)
 
 # Maintain your gem's version:
-require "core/version"
+require "blast/core/version" # Se agrega el namespace blast
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
-  spec.name        = "core"
-  spec.version     = Core::VERSION
-  spec.authors     = [""]
-  spec.email       = [""]
-  spec.homepage    = "TODO"
-  spec.summary     = "TODO: Summary of Core."
-  spec.description = "TODO: Description of Core."
+  spec.name        = "blast_core"                     # Se renombra core a blast_core
+  spec.version     = Blast::Core::VERSION             # Se agrega el namespace Blast
+  spec.authors     = ["Rodrigo Fernandez"]            # Tu nombre
+  spec.email       = ["rofaccess@gmail.com"]          # Tu correo
+  spec.homepage    = "https://github.com/rofaccess/blast_crm"
+  spec.summary     = "Core features of blast_crm."
+  spec.description = "Core features of blast_crm."
   spec.license     = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
