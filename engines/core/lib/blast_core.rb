@@ -1,0 +1,1 @@
+require 'blast/core'

@@ -1,5 +1,6 @@
-require "core/engine"
+require_relative 'core/engine'
 
-module Core
-  # Your code goes here...
+module Blast
+  module Core
+  end
 end
