@@ -1,4 +1,4 @@
-# Módulo Core
+# Módulo Core (Setup)
 ## Generación y configuración del módulo
 Generar un motor montable
 ```sh
@@ -386,3 +386,8 @@ Agregar un título al dashboard
 ```
 
 Acceder a la aplicación para ver los cambios
+
+## Resúmen
+- Los engines son generados con rails plugin new core --mountable
+- Se necesita una aplicación Ruby on Rails vacía para alojar los engines como gemas
+- Cuando se usan gemas dentro de un engine, estos deben ser requeridos cuando el engine es cargado.
