@@ -161,3 +161,48 @@ Reestructurar la carpeta controllers
 cd engines/core
 mv app/controllers/core app/controllers/blast
 ```
+
+Actualizar el ApplicationController del engine
+```ruby
+# blast_crm/engines/core/app/controllers/blast/application_controller.rb
+module Blast
+  class ApplicationController < ActionController::Base
+    protect_from_forgery with: :exception
+  end
+end
+```
+
+Crear un dashboard_controller con un index
+```bash
+touch app/controllers/blast/dashboard_controller.rb
+```
+
+```ruby
+# blast_crm/engines/core/app/controllers/blast/dashboard_controller.rb
+module Blast
+  class DashboardController < ApplicationController
+    def index
+    end
+  end
+end
+```
+
+Agregar la ruta
+```ruby
+# blast_crm/engines/core/config/routes.rb
+Blast::Core::Engine.routes.draw do
+  root to: "dashboard#index"
+end
+```
+
+Reestructurar la carpeta views y agregar una vista. Ejecutar los comandos desde la carpeta engines/core.
+```bash
+mv app/views/layouts/core app/views/layouts/blast
+mkdir -p app/views/blast/dashboard
+touch app/views/blast/dashboard/index.html.erb
+```
+
+Ejecutar la aplicación y acceder a [localhost:3000](http://localhost:3000/) para comprobar que todo funcione correctamente
+```bash
+docker compose up -d
+```
