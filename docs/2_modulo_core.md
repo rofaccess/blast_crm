@@ -260,3 +260,10 @@ bundle install # Se ejecuta esto para comprobar que los cambios realizados funci
 rails s -b 0.0.0.0 # Probar la ejecución de la aplicación padre
 exit
 ```
+
+Reorganizar la carpeta assets
+```bash
+mv app/assets/images/core app/assets/images/blast
+mv app/assets/javascripts/core app/assets/javascripts/blast
+mv app/assets/stylesheets/core app/assets/stylesheets/blast
+```
