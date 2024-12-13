@@ -177,6 +177,11 @@ Crear un dashboard_controller con un index
 touch app/controllers/blast/dashboard_controller.rb
 ```
 
+Alternativa usando el generador
+```bash
+rails g controller dashboard --no-assets --no-helper
+```
+
 ```ruby
 # blast_crm/engines/core/app/controllers/blast/dashboard_controller.rb
 module Blast
@@ -205,4 +210,53 @@ touch app/views/blast/dashboard/index.html.erb
 Ejecutar la aplicación y acceder a [localhost:3000](http://localhost:3000/) para comprobar que todo funcione correctamente
 ```bash
 docker compose up -d
+```
+
+## Estilizar la aplicación
+Agregar la gema de Bootstrap y sus dependencias al gemspec del core
+```ruby
+# blast_crm/engines/core/blast_core.gemspec
+# ...
+spec.add_dependency "rails", "~> 5.2.4", ">= 5.2.4.6"
+
+spec.add_dependency 'bootstrap', '~> 4.3.1'
+spec.add_dependency 'jquery-rails', '~> 4.3.3'
+spec.add_dependency 'sass-rails', '~> 5.0'
+
+spec.add_development_dependency "sqlite3"
+```
+
+Al usar las gemas dentro de un engine, estos no se cargan automáticamente. Para cargarlos se debe agregar los require 
+dentro del archivo blast_crm/engines/core/lib/blast/core.rb
+```ruby
+# blast_crm/engines/core/lib/blast/core.rb
+require_relative 'core/engine'
+require 'sass-rails'
+require 'bootstrap'
+require 'jquery-rails'
+
+module Blast
+  module Core
+  end
+end
+```
+Tener esto en cuenta al momento de agregar gemas a los engines.
+
+Habilitar la gema mini_racer e indicar la versión compatible en el Gemfile de la aplicación padre
+```ruby
+# blast_crm/Gemfile
+# See https://github.com/rails/execjs#readme for more supported runtimes
+gem 'mini_racer', '0.3.1', platforms: :ruby
+```
+Se requiere instalar esta gema para evitar un error relativo a execjs al momento de acceder a la aplicación.
+
+**Obs.:** Si se requiere reconstruir la imagen docker, será necesario comentar la gema blast_core del Gemfile. Luego de
+reconstruir se debe habilitar de nuevo la gema, levantar e ingresar al contenedor con docker run y ejecutar bundle install
+
+Ejecutar bundle install desde la aplicación padre y reiniciar el servidor.
+```bash
+docker compose run --rm -p 3000:3000 dev bash # Levantar el contenedor e ingresar dentro
+bundle install # Se ejecuta esto para comprobar que los cambios realizados funcionen correctamente
+rails s -b 0.0.0.0 # Probar la ejecución de la aplicación padre
+exit
 ```
