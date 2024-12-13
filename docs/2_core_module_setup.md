@@ -296,6 +296,7 @@ end
 
 Como se hicieron cambios en el Dockerfile, se requiere reconstruir la imagen mientras se levanta el contenedor
 ```bash
+docker volume rm blast_crm_gems_data # Borrar el volúmen de las gemas
 docker compose up --build
 ```
 
@@ -344,9 +345,10 @@ Cargar los archivos javascript de bootstrap
 //= require_tree .
 ```
 
-Ya que se reestructuraron los assets se debe actualizar el layout del módulo reemplazando core por blast.
+Ya que se reestructuraron los assets se debe actualizar el layout del módulo reemplazando core por blast en los links
+de los estilos y javascript.
 ```erb
-<-- blast_crm/engines/core/app/views/layouts/blast/application.html.erb -->
+<!-- blast_crm/engines/core/app/views/layouts/blast/application.html.erb -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -367,7 +369,7 @@ Ya que se reestructuraron los assets se debe actualizar el layout del módulo re
 
 Agregar el siguiente contenido al tag body del layout
 ```erb
-<-- blast_crm/engines/core/app/views/layouts/blast/application.html.erb -->
+<!-- blast_crm/engines/core/app/views/layouts/blast/application.html.erb -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light
             navbar-inverse navbar-fixed-top mb-4">
   <%= link_to 'BlastCRM', blast.root_path, class: 'navbar-brand' %>
@@ -377,10 +379,13 @@ Agregar el siguiente contenido al tag body del layout
   <%= yield %>
 </div>
 ```
+Es importante el uso de blast.root_path en vez de solamente root_path. Esto es necesario para que la aplicación no se
+rompa al intentar acceder a las vistas de Devise, el cual genera un conflicto al usar Devise dentro de un engine. 
+Es recomdable usar el prefijo del namespace (blast) in todas las rutas para evitar problemas potenciales.
 
 Agregar un título al dashboard
 ```erb
-<-- blast_crm/engines/core/app/views/blast/dashboard/index.html.erb -->
+<!-- blast_crm/engines/core/app/views/blast/dashboard/index.html.erb -->
 <h2>Dashboard</h2>
 <hr>
 ```
