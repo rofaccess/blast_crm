@@ -59,4 +59,7 @@ gem 'ffi', '~> 1.15.5'
 gem 'mimemagic', '~> 0.3.6'
 gem 'marcel', '~> 0.3.3'
 
-gem 'blast_core', path: './engines/core'
+# Condición necesaria para el Dockerfile
+if ENV['INSTALL_MODULES'] == 'true'
+  gem 'blast_core', path: './engines/core'
+end

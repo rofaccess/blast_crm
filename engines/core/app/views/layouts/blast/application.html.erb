@@ -5,12 +5,17 @@
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
-  <%= stylesheet_link_tag    "core/application", media: "all" %>
-  <%= javascript_include_tag "core/application" %>
+  <%= stylesheet_link_tag    "blast/application", media: "all" %>
+  <%= javascript_include_tag "blast/application" %>
 </head>
 <body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light
+                  navbar-inverse navbar-fixed-top mb-4">
+    <%= link_to 'BlastCRM', blast.root_path, class: 'navbar-brand' %>
+  </nav>
 
-<%= yield %>
-
+  <div class='container' role='main'>
+    <%= yield %>
+  </div>
 </body>
 </html>

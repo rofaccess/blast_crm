@@ -250,10 +250,63 @@ gem 'mini_racer', '0.3.1', platforms: :ruby
 ```
 Se requiere instalar esta gema para evitar un error relativo a execjs al momento de acceder a la aplicación.
 
-**Obs.:** Si se requiere reconstruir la imagen docker, será necesario comentar la gema blast_core del Gemfile. Luego de
-reconstruir se debe habilitar de nuevo la gema, levantar e ingresar al contenedor con docker run y ejecutar bundle install
+Actualizar el Dockerfile para que los módulos se puedan instalar. Primero se debe instalar la gemas sin los módulos, luego
+se vuelve a llamar a bundle installa para instalar los módulos. Para lograr esto se utiliza una variable de entorno
+a la que se denomina INSTALL_MODULES.
+```Dockerfile
+# Imagen base
+FROM ruby:2.6.3
 
-Ejecutar bundle install desde la aplicación padre y reiniciar el servidor.
+# Establece el directorio de trabajo
+WORKDIR /app
+
+# Copia el Gemfile al directorio de trabajo
+COPY Gemfile Gemfile.lock ./
+
+# Evita intalar los modulos porque en este punto todavía no se copiaron los módulos
+ENV INSTALL_MODULES=false
+# Ejecuta el comando bundle para instalar las gemas
+RUN bundle check || bundle install
+
+# Copia el directorio actual del host dentro del directorio de trabajo del contenedor
+COPY . .
+
+# Se instala los módulos
+ENV INSTALL_MODULES=true
+RUN bundle install
+
+# Se agrega y configura un usuario para evitar problemas de permisos en los archivos compartidos entre el host y el
+# contenedor. Dar permisos a /usr/local/bundle es para evitar errores al generar la aplicación Rails.
+RUN groupadd --system --gid 1000 rails && \
+    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
+    chown -R rails:rails /usr/local/bundle
+
+USER 1000:1000
+
+# Ejecuta la aplicación al levantar el contendedor
+CMD ["rails", "s", "-b", "0.0.0.0"]
+```
+
+También se debe condicionar la instalación de los módulos en el Gemfile
+```ruby
+if ENV['INSTALL_MODULES'] == 'true'
+  gem 'blast_core', path: './engines/core'
+end
+```
+
+Como se hicieron cambios en el Dockerfile, se requiere reconstruir la imagen mientras se levanta el contenedor
+```bash
+docker compose up --build
+```
+
+Acceder a la aplicación. 
+
+**Obs.:** Si algo falla, se puede probar instalar las gemas manualmente ingresando al contenedor con docker compose run. 
+También se puede descomentar la línea command: ["tail", "-f", "/dev/null"] de composable.yml para ejecutar el contenedor 
+con docker compose up en modo de espera para luego ingresar al contenedor con docker compose exec.
+
+Probar los siguientes comandos dentro del contenedor facilita la detección de problemas si es que no funciona la aplicación
+con docker compose up.
 ```bash
 docker compose run --rm -p 3000:3000 dev bash # Levantar el contenedor e ingresar dentro
 bundle install # Se ejecuta esto para comprobar que los cambios realizados funcionen correctamente
@@ -272,3 +325,64 @@ Renombrar aplicaction.css a application.css.scss
 ```bash
 mv app/assets/stylesheets/blast/application.css app/assets/stylesheets/blast/application.css.scss
 ```
+
+Importar bootstrap en application.css.scss
+```scss
+// blast_crm/engines/core/app/assets/stylesheets/blast/application.css.scss
+// ...
+@import "bootstrap";
+```
+
+Cargar los archivos javascript de bootstrap
+```js
+// blast_crm/engines/core/app/assets/javascripts/blast/application.js
+//= require rails-ujs
+//= require activestorage
+//= require jquery3
+//= require popper
+//= require bootstrap
+//= require_tree .
+```
+
+Ya que se reestructuraron los assets se debe actualizar el layout del módulo reemplazando core por blast.
+```erb
+<-- blast_crm/engines/core/app/views/layouts/blast/application.html.erb -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Core</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag    "blast/application", media: "all" %>
+    <%= javascript_include_tag "blast/application" %>
+</head>
+<body>
+
+<%= yield %>
+
+</body>
+</html>
+```
+
+Agregar el siguiente contenido al tag body del layout
+```erb
+<-- blast_crm/engines/core/app/views/layouts/blast/application.html.erb -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light
+            navbar-inverse navbar-fixed-top mb-4">
+  <%= link_to 'BlastCRM', blast.root_path, class: 'navbar-brand' %>
+</nav>
+
+<div class='container' role='main'>
+  <%= yield %>
+</div>
+```
+
+Agregar un título al dashboard
+```erb
+<-- blast_crm/engines/core/app/views/blast/dashboard/index.html.erb -->
+<h2>Dashboard</h2>
+<hr>
+```
+
+Acceder a la aplicación para ver los cambios
