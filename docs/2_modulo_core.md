@@ -267,3 +267,8 @@ mv app/assets/images/core app/assets/images/blast
 mv app/assets/javascripts/core app/assets/javascripts/blast
 mv app/assets/stylesheets/core app/assets/stylesheets/blast
 ```
+
+Renombrar aplicaction.css a application.css.scss
+```bash
+mv app/assets/stylesheets/blast/application.css app/assets/stylesheets/blast/application.css.scss
+```
