@@ -107,7 +107,7 @@ Gem::Specification.new do |spec|
 end
 ```
 
-Para que todo funcion bien se necesita actualir el archivo engines/core/bin/rails. Se debe agregar blast al ENGINE_PATH
+Para que todo funcione bien se necesita actualizar el archivo engines/core/bin/rails. Se debe agregar blast al ENGINE_PATH
 ```ruby
 # blast_crm/engines/core/bin/rails
 # ...
@@ -148,10 +148,16 @@ Rails.application.routes.draw do
 end
 ```
 
-Levantar el contenedor y acceder a http://localhost:3000 para comprobar que funciona.
+Levantar el contenedor y acceder a [localhost:3000](http://localhost:3000/) para comprobar que funciona.
 ```bash
 docker compose up -d
 ```
 
 ## Agregar contenido al módulo
 Por ahora se muestra la página por defecto de Rails, por lo que se procederá a agregar algún contenido.
+
+Reestructurar la carpeta controllers
+```bash
+cd engines/core
+mv app/controllers/core app/controllers/blast
+```
